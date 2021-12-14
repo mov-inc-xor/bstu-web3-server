@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import jwt from 'express-jwt'
 import { getDesk } from './api/desk'
-import { deleteList, postList, putList } from './api/list'
+import { deleteList, postList, putList, addTask } from './api/list'
 import { deleteTask, postTask } from './api/task'
 import { register, signin } from './api/user'
 import settings from './settings'
@@ -29,6 +29,7 @@ app.get('/desk', getDesk)
 
 // LIST
 app.post('/list', postList)
+app.post('/list/add', addTask)
 app.put('/list', putList)
 app.delete('/list', deleteList)
 

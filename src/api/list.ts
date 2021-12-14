@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { List } from '../models/List'
 import mongoose from 'mongoose'
-import { Task } from '../models/Task'
 
 const postList = async (req: Request, res: Response) => {
   const title = req.body.title
@@ -48,4 +47,4 @@ const deleteList = async (req: Request, res: Response) => {
     .catch((e: Error) => res.json({ error: e.message }))
 }
 
-export { postList, putList, deleteList }
+export { postList, addTask, putList, deleteList }
