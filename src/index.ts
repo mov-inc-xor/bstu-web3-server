@@ -1,47 +1,43 @@
 import express from 'express'
-import { v4 as uuidv4 } from 'uuid'
+import cors from 'cors'
+import jwt from 'express-jwt'
+import { getDesk } from './api/desk'
+import { deleteList, postList, putList } from './api/list'
+import { deleteTask, postTask } from './api/task'
+import { register, signin } from './api/user'
+import settings from './settings'
+import mongoose from 'mongoose'
 
 const app = express()
-const port = 8080
 
-const generateDesk = () => {
-  const generateTasks = () =>
-    Array.from(Array(Math.floor(3 + Math.random() * 7))).map(() => ({
-      text: `Задача с ID ${uuidv4()}`,
-    }))
+// MIDDLEWARES
+app.use(cors())
+app.use(express.json())
+app.use(
+  jwt({
+    secret: settings.secretKey,
+    algorithms: [settings.algorithm],
+  }).unless({ path: ['/register', '/signin'] })
+)
 
-  return {
-    desk: {
-      lists: [
-        {
-          title: 'Нераспределённые',
-          color: '#e5ebf5',
-          tasks: generateTasks(),
-        },
-        {
-          title: 'Ожидают доработок',
-          color: '#e5ebf5',
-          tasks: generateTasks(),
-        },
-        {
-          title: 'В работе',
-          color: '#e5ebf5',
-          tasks: generateTasks(),
-        },
-        {
-          title: 'Выполнены',
-          color: '#e5ebf5',
-          tasks: generateTasks(),
-        },
-      ],
-    },
-  }
-}
+// USER
+app.post('/register', register)
+app.post('/signin', signin)
 
-app.get('/desk', (req, res) => {
-  res.json(generateDesk())
-})
+// DESK
+app.get('/desk', getDesk)
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+// LIST
+app.post('/list', postList)
+app.put('/list', putList)
+app.delete('/list', deleteList)
+
+// TASK
+app.post('/task', postTask)
+app.delete('/task', deleteTask)
+
+mongoose.connect(settings.mongoDbConnection).then(() =>
+  app.listen(settings.port, () => {
+    console.log(`Listening at http://localhost:${settings.port}`)
+  })
+)
